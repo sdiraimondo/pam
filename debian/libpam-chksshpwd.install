@@ -1,2 +1,3 @@
 lib/*/security/pam_chksshpwd.so
 debian/pam-configs/chksshpwd	usr/share/pam-configs
+etc
