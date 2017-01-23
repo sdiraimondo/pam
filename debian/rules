@@ -36,7 +36,7 @@ override_dh_auto_configure:
 override_dh_install:
 	sed -e"s/@DEB_HOST_MULTIARCH@/$(DEB_HOST_MULTIARCH)/g" $(d)/libpam0g-dev.install.in > $(d)/libpam0g-dev.install
 ifneq (,$(findstring libpam-modules, $(shell dh_listpackages)))
-	dh_install -plibpam-modules -Xpam_cracklib
+	dh_install -plibpam-modules -Xpam_cracklib -Xpam_chksshpwd
 endif
 	dh_install -Nlibpam-modules
 

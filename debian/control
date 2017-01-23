@@ -102,3 +102,14 @@ Description: Documentation of PAM
  Contains documentation (in HTML, ASCII, and PostScript format) for libpam,
  the Pluggable Authentication Modules library, a library that enables the
  local system administrator to choose how applications authenticate users.
+
+Package: libpam-chksshpwd
+Section: admin
+Priority: optional
+Architecture: any
+Multi-Arch: same
+Depends: ${misc:Depends}, ${shlibs:Depends}, libpam0g (>= 1.1.3-2)
+Description: PAM module to enable cracklib support
+ This package includes libpam_chkpasswd, a PAM module that checks to see
+ if the default password has been changed when SSH is enabled.
+
