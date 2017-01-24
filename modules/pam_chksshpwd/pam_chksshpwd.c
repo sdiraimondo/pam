@@ -19,19 +19,22 @@ int pam_sm_open_session(pam_handle_t *pamh, int flags, int argc, const char **ar
 	char buf[1024], *salt;
 	FILE *fp;
 
-	// default is no warning
-	system ("rm /home/pi/.sshwarn");
+	// default is no warning, so delete the flag file
+	system ("rm /var/lib/chksshpwd/sshwarn");
 
 	// is SSH enabled?
 	fp = popen ("/usr/sbin/service ssh status | grep -q running", "r");
+	if (fp == NULL) return (PAM_SUCCESS);
 	if (pclose (fp)) return (PAM_SUCCESS);
 
 	// is password authentication for SSH enabled?
 	fp = popen ("grep -q '^PasswordAuthentication\\s*no' /etc/ssh/sshd_config", "r");
+	if (fp == NULL) return (PAM_SUCCESS);
 	if (!pclose (fp)) return (PAM_SUCCESS);
 
 	// get the pi user line from the shadow file
     fp = popen ("grep -E ^pi: /etc/shadow", "r");
+	if (fp == NULL) return (PAM_SUCCESS);
     fgets (buf, sizeof (buf) - 1, fp);
     if (pclose (fp)) return (PAM_SUCCESS);
 
@@ -43,7 +46,9 @@ int pam_sm_open_session(pam_handle_t *pamh, int flags, int argc, const char **ar
 		strtok (salt, ":");
 		if (!strcmp (salt, crypt ("raspberry", salt)))
 		{
-			 system ("touch /home/pi/.sshwarn");
+		    fp = fopen ("/var/lib/chksshpwd/sshwarn", "wb");
+		    fclose (fp);
+			 //system ("touch /home/pi/.sshwarn");
 		}
 	}
 
