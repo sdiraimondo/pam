@@ -97,3 +97,4 @@
 ./modules/pam_warn/pam_warn.c
 ./modules/pam_wheel/pam_wheel.c
 ./modules/pam_xauth/pam_xauth.c
+./etc/profile.d/sshpwd.sh

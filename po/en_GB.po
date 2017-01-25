@@ -570,3 +570,15 @@ msgstr ""
 #: modules/pam_unix/pam_unix_passwd.c:726
 msgid "Retype new UNIX password: "
 msgstr ""
+
+#: .././etc/profile.d/sshpwd.sh:7
+msgid ""
+"SSH is enabled and the default password for the 'pi' user has not been "
+"changed."
+msgstr ""
+
+#: .././etc/profile.d/sshpwd.sh:8
+msgid ""
+"This is a security risk - please login as the 'pi' user and type 'passwd' to "
+"set a new password."
+msgstr ""
