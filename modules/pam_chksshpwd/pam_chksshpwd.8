@@ -1,0 +1,75 @@
+'\" t
+.\"     Title: pam_chksshpwd
+.\"    Author: [see the "AUTHOR" section]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 01/25/2017
+.\"    Manual: Linux-PAM Manual
+.\"    Source: Linux-PAM Manual
+.\"  Language: English
+.\"
+.TH "PAM_CHKSSHPWD" "8" "01/25/2017" "Linux-PAM Manual" "Linux\-PAM Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+pam_chksshpwd \- Checks to see if SSH is available using the default password
+.SH "SYNOPSIS"
+.HP \w'\fBpam_chksshpwd\&.so\fR\ 'u
+\fBpam_chksshpwd\&.so\fR
+.SH "DESCRIPTION"
+.PP
+pam_chksshpwd is a PAM module that checks to see if SSH is enabled, and if so checks to see if the default password is unchanged\&. If SSH is enabled with password authentication, and the default password for the "pi" user is still "raspberry", the file 
+/var/lib/chksshpwd/sshwarn
+is created. If SSH logins are not possible with the default user account and password, this file is deleted if it exists\&.
+.SH "MODULE TYPES PROVIDED"
+.PP
+Only the
+\fBsession\fR
+module type is provided\&.
+.SH "RETURN VALUES"
+.PP
+PAM_SUCCESS
+.RS 4
+This is the only return value of this module\&.
+.RE
+.SH "EXAMPLES"
+.PP
+The suggested usage for
+/etc/pam\&.d/common-session
+is:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+session  optional  pam_chksshpwd\&.so
+      
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SH "SEE ALSO"
+.PP
+\fBpam.conf\fR(5),
+\fBpam.d\fR(5),
+\fBpam\fR(8)
+.SH "AUTHOR"
+.PP
+pam_motd was written by Simon Long <simon@raspberrypi\&.org>\&.

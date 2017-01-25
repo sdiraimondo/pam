@@ -1,0 +1,26 @@
+pam_chksshpwd — Checks to see if SSH is available using the default password
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DESCRIPTION
+
+pam_chksshpwd is a PAM module that checks to see if SSH is enabled,
+and if so checks to see if the default password is unchanged. If 
+SSH is enabled with password authentication, and the default
+password for the "pi" user is still "raspberry", the file
+/var/lib/chksshpwd/sshwarn is created.
+
+If SSH logins are not possible with the default user account and
+password, this file is deleted if it exists.
+
+EXAMPLES
+
+The suggested usage for /etc/pam.d/common-session is:
+
+session  optional  pam_chksshpwd.so
+
+
+AUTHOR
+
+pam_chksshpwd was written by Simon Long <simon@raspberrypi.org>.
+

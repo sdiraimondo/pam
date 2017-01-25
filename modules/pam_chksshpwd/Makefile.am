@@ -1,14 +1,11 @@
-#
-# Copyright (c) 2005, 2006, 2009 Thorsten Kukuk <kukuk@suse.de>
-#
-
 CLEANFILES = *~
-#MAINTAINERCLEANFILES = $(MANS) README
+MAINTAINERCLEANFILES = $(MANS) README
 
 #EXTRA_DIST = README $(MANS) $(XMLS) tst-pam_chksshpwd
+EXTRA_DIST = README $(MANS) $(XMLS)
 
-#man_MANS = pam_chksshpwd.8
-#XMLS = README.xml pam_chksshpwd.8.xml
+man_MANS = pam_chksshpwd.8
+XMLS = README.xml pam_chksshpwd.8.xml
 
 #TESTS = tst-pam_chksshpwd
 
@@ -24,8 +21,8 @@ endif
 securelib_LTLIBRARIES = pam_chksshpwd.la
 pam_chksshpwd_la_LIBADD = $(top_builddir)/libpam/libpam.la @LIBCRYPT@
 
-#if ENABLE_REGENERATE_MAN
-#noinst_DATA = README
-#README: pam_chksshpwd.8.xml
-#-include $(top_srcdir)/Make.xml.rules
-#endif
+if ENABLE_REGENERATE_MAN
+noinst_DATA = README
+README: pam_chksshpwd.8.xml
+-include $(top_srcdir)/Make.xml.rules
+endif
