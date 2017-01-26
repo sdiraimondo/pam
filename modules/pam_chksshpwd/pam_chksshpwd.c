@@ -2,6 +2,9 @@
 #include <string.h>
 #include <crypt.h>
 
+#include <security/_pam_macros.h>
+#include <security/pam_ext.h>
+
 /* Define which PAM interfaces we provide */
 #define PAM_SM_SESSION
 
@@ -10,13 +13,13 @@
 #include <security/pam_modules.h>
   
 /* PAM entry point for session creation */
-int pam_sm_open_session (pam_handle_t *pamh, int flags, int argc, const char **argv)
+PAM_EXTERN int pam_sm_open_session (pam_handle_t *pamh, int flags, int argc, const char **argv)
 {
 	char buf[1024], *salt;
 	FILE *fp;
 
 	// default is no warning, so delete the flag file
-	system ("rm /var/lib/chksshpwd/sshwarn");
+	system ("if [ -e /var/lib/chksshpwd/sshwarn ] ; then rm /var/lib/chksshpwd/sshwarn ; fi");
 
 	// is SSH enabled?
 	if ((fp = popen ("/usr/sbin/service ssh status | grep -q running", "r")) == NULL) return PAM_IGNORE;
@@ -28,7 +31,11 @@ int pam_sm_open_session (pam_handle_t *pamh, int flags, int argc, const char **a
 
 	// get the pi user line from the shadow file
 	if ((fp = popen ("grep -E ^pi: /etc/shadow", "r")) == NULL) return PAM_IGNORE;
-	if (fgets (buf, sizeof (buf) - 1, fp) == NULL) return PAM_IGNORE;
+	if (fgets (buf, sizeof (buf) - 1, fp) == NULL)
+	{
+	    pclose (fp);
+	    return PAM_IGNORE;
+	}
 	if (pclose (fp)) return PAM_IGNORE;
 
 	// check for locked password or password disabled
@@ -51,7 +58,22 @@ int pam_sm_open_session (pam_handle_t *pamh, int flags, int argc, const char **a
 }
 
 /* PAM entry point for session cleanup */
-int pam_sm_close_session (pam_handle_t *pamh, int flags, int argc, const char **argv)
+PAM_EXTERN int pam_sm_close_session (pam_handle_t *pamh, int flags, int argc, const char **argv)
 {
 	return PAM_IGNORE;
 }
+
+#ifdef PAM_STATIC
+
+struct pam_module _pam_chksshpwd_modstruct =
+{
+	"pam_chksshpwd",
+	NULL,
+	NULL,
+	NULL,
+	pam_sm_open_session,
+	pam_sm_close_session,
+	NULL,
+};
+
+#endif
