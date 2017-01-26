@@ -19,18 +19,18 @@ PAM_EXTERN int pam_sm_open_session (pam_handle_t *pamh, int flags, int argc, con
 	FILE *fp;
 
 	// default is no warning, so delete the flag file
-	system ("if [ -e /var/lib/chksshpwd/sshwarn ] ; then rm /var/lib/chksshpwd/sshwarn ; fi");
+	system ("if [ -e /var/lib/chksshpwd/sshwarn ] ; then /bin/rm /var/lib/chksshpwd/sshwarn ; fi");
 
 	// is SSH enabled?
-	if ((fp = popen ("ps -C sshd | grep -q sshd", "r")) == NULL) return PAM_IGNORE;
+	if ((fp = popen ("/usr/bin/pgrep -cx -u root sshd > /dev/null", "r")) == NULL) return PAM_IGNORE;
 	if (pclose (fp)) return PAM_IGNORE;
 
 	// is password authentication for SSH enabled?
-	if ((fp = popen ("grep -q '^PasswordAuthentication\\s*no' /etc/ssh/sshd_config", "r")) == NULL) return PAM_IGNORE;
+	if ((fp = popen ("/bin/grep -q '^PasswordAuthentication\\s*no' /etc/ssh/sshd_config", "r")) == NULL) return PAM_IGNORE;
 	if (!pclose (fp)) return PAM_IGNORE;
 
 	// get the pi user line from the shadow file
-	if ((fp = popen ("grep -E ^pi: /etc/shadow", "r")) == NULL) return PAM_IGNORE;
+	if ((fp = popen ("/bin/grep ^pi: /etc/shadow", "r")) == NULL) return PAM_IGNORE;
 	if (fgets (buf, sizeof (buf) - 1, fp) == NULL)
 	{
 	    pclose (fp);
