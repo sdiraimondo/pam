@@ -22,7 +22,7 @@ PAM_EXTERN int pam_sm_open_session (pam_handle_t *pamh, int flags, int argc, con
 	system ("if [ -e /var/lib/chksshpwd/sshwarn ] ; then rm /var/lib/chksshpwd/sshwarn ; fi");
 
 	// is SSH enabled?
-	if ((fp = popen ("/usr/sbin/service ssh status | grep -q running", "r")) == NULL) return PAM_IGNORE;
+	if ((fp = popen ("ps -C sshd | grep -q sshd", "r")) == NULL) return PAM_IGNORE;
 	if (pclose (fp)) return PAM_IGNORE;
 
 	// is password authentication for SSH enabled?
