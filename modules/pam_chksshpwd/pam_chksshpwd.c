@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <crypt.h>
 #include <unistd.h>
 #include <shadow.h>
+#include <regex.h>
 #include <sys/stat.h>
 
 /* Define which PAM interfaces we provide */
@@ -13,6 +15,8 @@
 #include <security/pam_ext.h>
 #include <security/pam_appl.h>
 #include <security/pam_modules.h>
+
+#define SSHWARN "/run/sshwarn"
   
 /* PAM entry point for session creation */
 PAM_EXTERN int pam_sm_open_session (pam_handle_t *pamh, int flags, int argc, const char **argv)
@@ -20,20 +24,33 @@ PAM_EXTERN int pam_sm_open_session (pam_handle_t *pamh, int flags, int argc, con
 	struct stat sbuf;
 	struct spwd *sp;
 	FILE *fp;
-
-	// check directory exists; create it if not
-	if (stat ("/run/chksshpwd", &sbuf)) mkdir ("/run/chksshpwd", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	char *linebuf = NULL;
+	size_t nchars;
+	regex_t pwregex;
 
 	// default is no warning, so delete the flag file if it exists
-	if (!stat ("/run/chksshpwd/sshwarn", &sbuf)) unlink ("/run/chksshpwd/sshwarn");
+	if (stat (SSHWARN, &sbuf) == 0) unlink (SSHWARN);
 
 	// is SSH enabled?
-	if ((fp = popen ("/usr/bin/pgrep -cx -u root sshd > /dev/null", "r")) == NULL) return PAM_IGNORE;
-	if (pclose (fp)) return PAM_IGNORE;
+	if (stat ("/run/sshd.pid", &sbuf) == -1) return PAM_IGNORE;
 
 	// is password authentication for SSH enabled?
-	if ((fp = popen ("/bin/grep -q '^PasswordAuthentication\\s*no' /etc/ssh/sshd_config", "r")) == NULL) return PAM_IGNORE;
-	if (!pclose (fp)) return PAM_IGNORE;
+	fp = fopen ("/etc/ssh/sshd_config", "r");
+	if (fp)
+	{
+		regcomp (&pwregex, "^PasswordAuthentication\\s*no", REG_EXTENDED);
+		while (getline (&linebuf, &nchars, fp) != -1)
+		{
+			if (!regexec (&pwregex, linebuf, 0, NULL, 0))
+			{
+				free (linebuf);
+				fclose (fp);
+				return PAM_IGNORE;
+			}
+		}
+		free (linebuf);
+		fclose (fp);
+	}
 
 	// get the pi user entry from the shadow file
 	setspent ();
@@ -48,7 +65,7 @@ PAM_EXTERN int pam_sm_open_session (pam_handle_t *pamh, int flags, int argc, con
 		if (enc && !strcmp (sp->sp_pwdp, enc))
 		{
 			// password match - create the flag file
-			fp = fopen ("/run/chksshpwd/sshwarn", "wb");
+			fp = fopen (SSHWARN, "wb");
 			fclose (fp);
 		}
 	}
