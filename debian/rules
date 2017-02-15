@@ -46,6 +46,7 @@ override_dh_installman:
 	pod2man --section 8 --release="Debian GNU/Linux" $(dl)/pam_getenv >$(dl)/pam_getenv.8
 	dh_installman
 	rm -f $(d)/libpam-modules/usr/share/man/man5/pam.conf.5
+	rm -f $(d)/libpam-modules/usr/share/man/man8/pam_chksshpwd.8
 	rm -f $(d)/libpam-modules/usr/share/man/man8/pam_cracklib.8
 	rm -f $(d)/libpam-modules/usr/share/man/man8/pam_timestamp_check.8
 
