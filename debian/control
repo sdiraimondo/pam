@@ -108,7 +108,7 @@ Section: admin
 Priority: optional
 Architecture: any
 Multi-Arch: same
-Depends: ${misc:Depends}, ${shlibs:Depends}, libpam0g, libpam-runtime
+Depends: ${misc:Depends}, ${shlibs:Depends}, libpam0g, libpam-runtime, gettext-base
 Description: PAM module to enable SSH password checking support
  This package includes libpam_chkpasswd, a PAM module that checks to see
  if the default password has been changed when SSH is enabled.
